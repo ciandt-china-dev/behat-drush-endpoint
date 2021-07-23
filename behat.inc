@@ -38,6 +38,9 @@ function drush_behat_op_create_node($node) {
 
   $node->nid = $entity->id();
 
+  // Add url alias to result object.
+  $node->url_alias = \Drupal::service('path_alias.manager')->getAliasByPath('/node/' . $node->nid);
+
   return (array) $node;
 }
 
@@ -146,8 +149,12 @@ function _drush_behat_expand_entity_fields($entity_type, \stdClass $entity) {
 function _drush_behat_get_field_handler_common($entity, $entity_type, $field_name, $core_namespace) {
   $field_types = _drush_behat_get_entity_field_types($entity_type);
   $camelized_type = _drush_behat_camelize($field_types[$field_name]);
+  // Priority execution of expanded field Handlers.
   $default_class = sprintf('\Drupal\Driver\Fields\%s\DefaultHandler', $core_namespace);
-  $class_name = sprintf('\Drupal\Driver\Fields\%s\%sHandler', $core_namespace, $camelized_type);
+  $class_name = sprintf('\Drush\Commands\behat_drush_endpoint\expand\Fields\%s\%sHandler', $core_namespace, $camelized_type);
+  if (!class_exists($class_name)) {
+    $class_name = sprintf('\Drupal\Driver\Fields\%s\%sHandler', $core_namespace, $camelized_type);
+  }
   if (class_exists($class_name)) {
     return new $class_name($entity, $entity_type, $field_name);
   }
