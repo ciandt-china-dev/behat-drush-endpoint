@@ -41,7 +41,11 @@ class BehatDrushEndpointCommands extends DrushCommands
     // Dispatch if the operation exists.
     $fn = 'drush_behat_op_' . strtr($operation, '-', '_');
     if (function_exists($fn)) {
-      return $fn($obj);
+      // Drush client cannot get a boolean return result.
+      // See isField method in Drupal\Driver\DrushDriver.
+      $result = $fn($obj);
+      is_bool($result) && $result = $result ? 'true' : 'false';
+      return $result;
     }
     else {
       throw new \Exception(dt("Operation '!op' unknown", array('!op' => $operation)));
