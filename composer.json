@@ -38,6 +38,11 @@
         },
         "sort-packages": true
     },
+    "autoload": {
+        "psr-4": {
+            "Drush\\Commands\\behat_drush_endpoint\\": "./"
+        }
+    },
     "autoload-dev": {
         "psr-4": {
           "TestUtils\\": "tests/src/"
